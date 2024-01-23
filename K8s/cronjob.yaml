@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: thingspeak-demo
+  namespace: default
+  labels:
+    job_name: thingspeak-demo
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - image: "petrjamf/thingspeak-demo"
+              imagePullPolicy: IfNotPresent
+              name: "thingspeak-demo"
+              env:
+              - name: "API_KEY"
+                valueFrom:
+                  secretKeyRef:
+                    name: thingspeak-api-key
+                    key: api_key
+              - name: "CHANNEL_ID"
+                valueFrom:
+                  secretKeyRef:
+                    name: thingspeak-channel-id
+                    key: channel_id
+          restartPolicy: Never
